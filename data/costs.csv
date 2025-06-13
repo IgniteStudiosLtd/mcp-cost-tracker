@@ -1,0 +1,10 @@
+Date,Time,Project,Phase,Cost,Duration,Description,Session_ID
+2025-06-12,21:30:00,Recall,Setup & Planning,2.83,59m 32s,Project init best practices setup GitHub issues,session_001
+2025-06-12,22:15:00,Recall,Setup,0.74,37m 15s,Created cost tracking system with CSV and HTML dashboard,session_002
+2025-06-12,22:30:00,Recall,Setup,0.03,8m 15s,Created cost tracking quick guide documentation,session_003
+2025-06-12,12:37:11,MCP-Cost-Tracker,Development,2.75,45m,Test cost tracking functionality,session_1749767831
+2025-06-12,17:04:53,MCP-Cost-Tracker,Development,2.75,45m,Test cost tracking functionality,session_1749783893
+2025-06-12,17:04:55,MCP-Cost-Tracker,Testing,2.5,30m,MCP server test,session_1749783895
+2025-06-12,20:15:14,MCP-Cost-Tracker,Development,2.75,45m,Test cost tracking functionality,session_1749795314
+2025-06-12,20:15:19,MCP-Cost-Tracker,Testing,2.5,30m,MCP server test,session_1749795319
+2025-06-12,20:56:00,MCP-Cost-Tracker,Testing,1.25,15m,Testing tc command functionality,session_1749797760

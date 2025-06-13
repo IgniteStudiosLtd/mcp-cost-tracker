@@ -1,0 +1,23 @@
+#!/bin/bash
+# Quick cost overview
+# Part of MCP Cost Tracker
+
+# Load shared configuration
+source "$(dirname "$0")/config.sh"
+
+# Read from CSV file
+if [[ -f "$CSV_FILE" && $(wc -l < "$CSV_FILE") -gt 1 ]]; then
+    # Get last session cost
+    LAST_COST=$(tail -1 "$CSV_FILE" | cut -d',' -f5)
+    
+    # Calculate total from CSV
+    TOTAL_COST=$(tail -n +2 "$CSV_FILE" | cut -d',' -f5 | awk '{sum += $1} END {print sum}')
+    
+    # Get session count
+    SESSION_COUNT=$(($(wc -l < "$CSV_FILE") - 1))
+    
+    # Format output
+    echo "Last task: \$${LAST_COST} | Total cost: \$${TOTAL_COST} | Sessions: ${SESSION_COUNT}"
+else
+    echo "Last task: \$0.00 | Total cost: \$0.00 | Sessions: 0"
+fi

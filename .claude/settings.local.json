@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./commands/costs)",
+      "Bash(./commands/generate-dashboard)",
+      "Bash(python3:*)",
+      "Bash(ls:*)",
+      "Bash(git init:*)"
+    ],
+    "deny": []
+  }
+}

@@ -1,0 +1,25 @@
+#!/bin/bash
+# View costs dashboard
+# Part of MCP Cost Tracker
+
+# Load shared configuration
+source "$(dirname "$0")/config.sh"
+
+echo "🌐 MCP Cost Tracker - View Dashboard"
+echo "====================================="
+
+# Check if dashboard exists
+if [[ ! -f "$HTML_FILE" ]]; then
+    echo "📊 Generating dashboard..."
+    "$MCP_COST_TRACKER_HOME/commands/generate-dashboard"
+fi
+
+# Open dashboard in browser
+if [[ -f "$HTML_FILE" ]]; then
+    echo "🌐 Opening costs dashboard in browser..."
+    open "$HTML_FILE"
+    echo "📊 Dashboard URL: file://$HTML_FILE"
+else
+    echo "❌ Could not generate dashboard"
+    echo "💡 Make sure you have cost data. Run '/tc' to add a session."
+fi

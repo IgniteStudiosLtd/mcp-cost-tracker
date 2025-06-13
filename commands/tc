@@ -1,0 +1,49 @@
+#!/bin/bash
+# Track costs for Claude Code sessions
+# Part of MCP Cost Tracker
+
+# Load shared configuration
+source "$(dirname "$0")/config.sh"
+
+echo "💰 MCP Cost Tracker - Track Session"
+echo "===================================="
+
+# Prompt user for session details
+echo "📊 Session completed. Please provide details:"
+echo ""
+read -p "💵 Session cost (e.g., 2.83): $" SESSION_COST
+read -p "⏱️  Duration (e.g., 59m 32s): " DURATION
+read -p "🏷️  Phase/category (e.g., Planning, Development): " PHASE
+read -p "📝 Brief description of tasks completed: " DESCRIPTION
+read -p "🏗️  Project name (optional): " PROJECT_NAME
+
+# Default project name if not provided
+if [[ -z "$PROJECT_NAME" ]]; then
+    PROJECT_NAME="General"
+fi
+
+# Get current date and time
+DATE=$(date +"%Y-%m-%d")
+TIME=$(date +"%H:%M:%S")
+SESSION_ID="session_$(date +%s)"
+
+# Create CSV file if it doesn't exist
+if [[ ! -f "$CSV_FILE" ]]; then
+    echo "📄 Creating new CSV cost tracking file..."
+    mkdir -p "$(dirname "$CSV_FILE")"
+    echo "Date,Time,Project,Phase,Cost,Duration,Description,Session_ID" > "$CSV_FILE"
+fi
+
+# Append new entry to CSV
+echo "$DATE,$TIME,$PROJECT_NAME,$PHASE,$SESSION_COST,$DURATION,$DESCRIPTION,$SESSION_ID" >> "$CSV_FILE"
+
+# Generate updated HTML dashboard
+echo "🌐 Generating updated dashboard..."
+"$MCP_COST_TRACKER_HOME/commands/generate-dashboard"
+
+echo ""
+echo "✅ Cost tracking updated!"
+echo "📊 CSV file: $CSV_FILE"
+echo "🌐 Dashboard: $WEB_DIR/costs.html"
+echo ""
+echo "💡 Run '/vc' to view the updated dashboard"

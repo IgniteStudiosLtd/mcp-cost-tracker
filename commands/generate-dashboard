@@ -1,0 +1,282 @@
+#!/bin/bash
+# Generate HTML dashboard with embedded CSV data
+# Part of MCP Cost Tracker
+
+# Load shared configuration
+source "$(dirname "$0")/config.sh"
+
+echo "📊 Generating MCP Cost Tracker dashboard..."
+
+# Check if CSV file exists
+if [[ ! -f "$CSV_FILE" ]]; then
+    echo "❌ No cost data found at $CSV_FILE"
+    echo "💡 Run '/tc' to add your first session"
+    exit 1
+fi
+
+# Create web directory if it doesn't exist
+mkdir -p "$(dirname "$HTML_FILE")"
+
+# Read CSV data and convert to JSON with proper escaping
+CSV_DATA=$(tail -n +2 "$CSV_FILE" | python3 -c "
+import csv
+import json
+import sys
+
+data = []
+reader = csv.reader(sys.stdin)
+for row in reader:
+    if len(row) >= 8:  # Ensure we have all expected columns
+        data.append(row)
+
+# Output as JSON array elements, one per line
+for i, row in enumerate(data):
+    comma = ',' if i < len(data) - 1 else ''
+    print(f'        {json.dumps(row)}{comma}')
+")
+
+# Generate HTML with embedded data
+cat > "$HTML_FILE" << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Cost Tracker Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f7; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #1d1d1f; font-size: 2.5em; margin-bottom: 10px; }
+        .header p { color: #86868b; font-size: 1.1em; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 2em; font-weight: bold; color: #007AFF; }
+        .stat-label { color: #86868b; margin-top: 5px; }
+        .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .search-box, .filter-select { padding: 10px; border: 1px solid #d2d2d7; border-radius: 8px; font-size: 16px; }
+        .search-box { flex: 1; min-width: 200px; }
+        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f6f6f6; padding: 15px; text-align: left; font-weight: 600; border-bottom: 1px solid #d2d2d7; cursor: pointer; }
+        th:hover { background: #e8e8ed; }
+        td { padding: 15px; border-bottom: 1px solid #f6f6f6; }
+        tr:hover { background: #f9f9f9; }
+        .cost { font-weight: bold; color: #007AFF; }
+        .no-data { text-align: center; padding: 40px; color: #86868b; }
+        .phase-tag { padding: 4px 8px; border-radius: 6px; font-size: 0.9em; font-weight: 500; }
+        .phase-development { background: #007AFF20; color: #007AFF; }
+        .phase-planning { background: #34C75920; color: #34C759; }
+        .phase-testing { background: #FF950020; color: #FF9500; }
+        .phase-debugging { background: #FF384220; color: #FF3842; }
+        .phase-documentation { background: #AF52DE20; color: #AF52DE; }
+        .phase-general { background: #8E8E9320; color: #8E8E93; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 MCP Cost Tracker</h1>
+            <p>Claude Code session cost analysis and tracking</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCost">$0.00</div>
+                <div class="stat-label">Total Cost</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="sessionCount">0</div>
+                <div class="stat-label">Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgCost">$0.00</div>
+                <div class="stat-label">Average per Session</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="lastCost">$0.00</div>
+                <div class="stat-label">Last Session</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search sessions...">
+            <select class="filter-select" id="projectFilter">
+                <option value="">All Projects</option>
+            </select>
+            <select class="filter-select" id="phaseFilter">
+                <option value="">All Phases</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table id="costsTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Date ↕️</th>
+                        <th onclick="sortTable(1)">Time ↕️</th>
+                        <th onclick="sortTable(2)">Project ↕️</th>
+                        <th onclick="sortTable(3)">Phase ↕️</th>
+                        <th onclick="sortTable(4)">Cost ↕️</th>
+                        <th onclick="sortTable(5)">Duration ↕️</th>
+                        <th onclick="sortTable(6)">Description ↕️</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Embedded cost data
+        const costData = [
+CSV_DATA_PLACEHOLDER
+        ];
+
+        let currentSort = { column: 0, direction: 'desc' };
+        let filteredData = [...costData];
+
+        function initializeDashboard() {
+            updateStats();
+            populateFilters();
+            renderTable();
+            setupEventListeners();
+        }
+
+        function updateStats() {
+            const totalCost = costData.reduce((sum, row) => sum + parseFloat(row[4] || 0), 0);
+            const sessionCount = costData.length;
+            const avgCost = sessionCount > 0 ? totalCost / sessionCount : 0;
+            const lastCost = sessionCount > 0 ? parseFloat(costData[costData.length - 1][4] || 0) : 0;
+
+            document.getElementById('totalCost').textContent = `$${totalCost.toFixed(2)}`;
+            document.getElementById('sessionCount').textContent = sessionCount;
+            document.getElementById('avgCost').textContent = `$${avgCost.toFixed(2)}`;
+            document.getElementById('lastCost').textContent = `$${lastCost.toFixed(2)}`;
+        }
+
+        function populateFilters() {
+            const projects = [...new Set(costData.map(row => row[2]))].sort();
+            const phases = [...new Set(costData.map(row => row[3]))].sort();
+
+            const projectFilter = document.getElementById('projectFilter');
+            const phaseFilter = document.getElementById('phaseFilter');
+
+            projects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project;
+                option.textContent = project;
+                projectFilter.appendChild(option);
+            });
+
+            phases.forEach(phase => {
+                const option = document.createElement('option');
+                option.value = phase;
+                option.textContent = phase;
+                phaseFilter.appendChild(option);
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">No sessions found</td></tr>';
+                return;
+            }
+
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+                const phaseClass = `phase-${row[3].toLowerCase().replace(/[^a-z]/g, '')}`;
+                
+                tr.innerHTML = `
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td><span class="phase-tag ${phaseClass}">${row[3]}</span></td>
+                    <td class="cost">$${parseFloat(row[4]).toFixed(2)}</td>
+                    <td>${row[5]}</td>
+                    <td>${row[6]}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function sortTable(columnIndex) {
+            if (currentSort.column === columnIndex) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = columnIndex;
+                currentSort.direction = 'asc';
+            }
+
+            filteredData.sort((a, b) => {
+                let aVal = a[columnIndex];
+                let bVal = b[columnIndex];
+
+                if (columnIndex === 4) { // Cost column
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                }
+
+                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderTable();
+        }
+
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const projectFilter = document.getElementById('projectFilter').value;
+            const phaseFilter = document.getElementById('phaseFilter').value;
+
+            filteredData = costData.filter(row => {
+                const matchesSearch = row.some(cell => 
+                    cell.toString().toLowerCase().includes(searchTerm)
+                );
+                const matchesProject = !projectFilter || row[2] === projectFilter;
+                const matchesPhase = !phaseFilter || row[3] === phaseFilter;
+
+                return matchesSearch && matchesProject && matchesPhase;
+            });
+
+            renderTable();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', filterData);
+            document.getElementById('projectFilter').addEventListener('change', filterData);
+            document.getElementById('phaseFilter').addEventListener('change', filterData);
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>
+EOF
+
+# Replace placeholder with actual CSV data using Python for safer replacement
+python3 -c "
+import sys
+
+# Read the HTML file
+with open('$HTML_FILE', 'r') as f:
+    content = f.read()
+
+# Replace placeholder with CSV data
+csv_data = '''$CSV_DATA'''
+content = content.replace('CSV_DATA_PLACEHOLDER', csv_data)
+
+# Write back to file
+with open('$HTML_FILE', 'w') as f:
+    f.write(content)
+"
+
+echo "✅ Dashboard generated: $HTML_FILE"
+echo "📊 Sessions loaded: $(tail -n +2 "$CSV_FILE" | wc -l | tr -d ' ')"

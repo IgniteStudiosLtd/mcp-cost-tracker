@@ -1,6 +1,15 @@
-# MCP Cost Tracker
+# MCP Cost Tracker for Claude Code
 
-A professional MCP (Model Context Protocol) server for tracking Claude Code usage costs across all your projects. Built for developers who want to monitor and analyze their AI development costs with precision.
+An MCP (Model Context Protocol) server for tracking Claude Code usage costs across all your projects. Built for developers who want to monitor and analyze their AI development costs with precision. 
+
+This entire project cost a total of US$16.27 for Claude Code to build.  Itʻs designed for personal use, please enjoy! 🤙  
+
+If you decide to commercialize or use it in your enterpise, please consider buying me a coffee https://ko-fi.com/kingi or sponsor this project. ❤️
+
+1. Install
+2. Simply type /tc to track a cost
+3. Type /vc to see a visual dashboard in your browser
+
 
 ## 🚀 Features
 
@@ -17,6 +26,7 @@ A professional MCP (Model Context Protocol) server for tracking Claude Code usag
 
 *Interactive dashboard showing session tracking with project filtering and cost analytics*
 
+
 ## 🛠 Installation
 
 ### Prerequisites
@@ -26,7 +36,7 @@ A professional MCP (Model Context Protocol) server for tracking Claude Code usag
 
 ### Step 1: Clone Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/mcp-cost-tracker.git
+git clone https://github.com/IgniteStudiosLtd/mcp-cost-tracker.git
 cd mcp-cost-tracker
 ```
 
@@ -60,6 +70,7 @@ Add to your **global** Claude Code settings at `~/.config/claude/settings.json`:
 2. **Test MCP connection**: Ask Claude to use the `get_cost_summary` tool
 3. **Test local commands**: Run `./commands/costs` from the mcp-cost-tracker directory
 
+
 ## 💡 Usage
 
 ### Command Line Interface
@@ -77,6 +88,7 @@ From the mcp-cost-tracker directory:
 ./commands/costs
 ```
 
+
 ### MCP Tools (Available in any Claude Code session)
 
 - **`track_cost`**: Log session costs with structured parameters
@@ -84,12 +96,14 @@ From the mcp-cost-tracker directory:
 - **`get_cost_history`**: Get filtered session history
 - **`generate_dashboard`**: Update the HTML dashboard
 
+
 ### Example MCP Usage
 
 In any Claude Code session:
 ```
 Use the track_cost tool to log this session with cost 2.50, duration "30m", phase "Development", description "Added user authentication", project "MyApp"
 ```
+
 
 ## 📊 Data Schema
 
@@ -100,6 +114,7 @@ Session,Date,Time,Project,Phase,Cost,Duration,Description,Session_ID
 1,2025-06-12,21:30:00,MyProject,Development,2.83,45m,Added new feature,session_001
 2,2025-06-12,22:15:00,MyProject,Testing,1.25,20m,Fixed user login bug,session_002
 ```
+
 
 ## 🏗 Architecture
 
@@ -134,6 +149,7 @@ The dashboard auto-generates from CSV data. To customize:
 2. Update HTML template and JavaScript
 3. Run `./commands/generate-dashboard` to rebuild
 
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -146,21 +162,24 @@ The dashboard auto-generates from CSV data. To customize:
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
 
-**Gilbert King**  
+## 👨‍💻  Kia ora! Aloha!  
+
+**Na Kingi Gilbert**  
 - GitHub: [@kingigilbert](https://github.com/kingigilbert)
-- Company: Ignite Studios Ltd
+- Company: Kingi Gilbert, Ignite Studios Ltd - Aotearoa
+
 
 ## 🐛 Issues & Support
 
-- **Bug Reports**: [GitHub Issues](https://github.com/YOUR_USERNAME/mcp-cost-tracker/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/YOUR_USERNAME/mcp-cost-tracker/discussions)
+- **Bug Reports**: [GitHub Issues](https://github.com/IgniteStudiosLtd/mcp-cost-tracker/issues)
+- **Feature Requests**: [GitHub Discussions](https://github.com/IgniteStudiosLtd/mcp-cost-tracker/discussions)
 - **Documentation**: See [setup-global-mcp.md](setup-global-mcp.md) for detailed MCP configuration
+
 
 ## 🙏 Acknowledgments
 
-Built with [Claude Code](https://claude.ai/code) - AI-powered development tool by Anthropic.
+Designed by Kingi Gilbert. Built with [Claude Code](https://claude.ai/code) - AI-powered development tool by Anthropic.
 
 ---
 

@@ -5,7 +5,8 @@
       "Bash(./commands/generate-dashboard)",
       "Bash(python3:*)",
       "Bash(ls:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(./commands/vc)"
     ],
     "deny": []
   }

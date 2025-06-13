@@ -31,11 +31,15 @@ SESSION_ID="session_$(date +%s)"
 if [[ ! -f "$CSV_FILE" ]]; then
     echo "📄 Creating new CSV cost tracking file..."
     mkdir -p "$(dirname "$CSV_FILE")"
-    echo "Date,Time,Project,Phase,Cost,Duration,Description,Session_ID" > "$CSV_FILE"
+    echo "Session,Date,Time,Project,Phase,Cost,Duration,Description,Session_ID" > "$CSV_FILE"
 fi
 
+# Get next session number
+SESSION_NUMBER=$(tail -n +2 "$CSV_FILE" | wc -l | tr -d ' ')
+SESSION_NUMBER=$((SESSION_NUMBER + 1))
+
 # Append new entry to CSV
-echo "$DATE,$TIME,$PROJECT_NAME,$PHASE,$SESSION_COST,$DURATION,$DESCRIPTION,$SESSION_ID" >> "$CSV_FILE"
+echo "$SESSION_NUMBER,$DATE,$TIME,$PROJECT_NAME,$PHASE,$SESSION_COST,$DURATION,$DESCRIPTION,$SESSION_ID" >> "$CSV_FILE"
 
 # Generate updated HTML dashboard
 echo "🌐 Generating updated dashboard..."

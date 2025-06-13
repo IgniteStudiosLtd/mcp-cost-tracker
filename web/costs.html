@@ -11,7 +11,7 @@
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 { color: #1d1d1f; font-size: 2.5em; margin-bottom: 10px; }
         .header p { color: #86868b; font-size: 1.1em; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .stat-value { font-size: 2em; font-weight: bold; color: #007AFF; }
         .stat-label { color: #86868b; margin-top: 5px; }
@@ -59,6 +59,10 @@
                 <div class="stat-value" id="lastCost">$0.00</div>
                 <div class="stat-label">Last Session</div>
             </div>
+            <div class="stat-card" id="projectTotalCard" style="display: none;">
+                <div class="stat-value" id="projectTotal">$0.00</div>
+                <div class="stat-label" id="projectTotalLabel">Project Total</div>
+            </div>
         </div>
 
         <div class="controls">
@@ -75,13 +79,14 @@
             <table id="costsTable">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">Date ↕️</th>
-                        <th onclick="sortTable(1)">Time ↕️</th>
-                        <th onclick="sortTable(2)">Project ↕️</th>
-                        <th onclick="sortTable(3)">Phase ↕️</th>
-                        <th onclick="sortTable(4)">Cost ↕️</th>
-                        <th onclick="sortTable(5)">Duration ↕️</th>
-                        <th onclick="sortTable(6)">Description ↕️</th>
+                        <th onclick="sortTable(0)">#</th>
+                        <th onclick="sortTable(1)">Date ↕️</th>
+                        <th onclick="sortTable(2)">Time ↕️</th>
+                        <th onclick="sortTable(3)">Project ↕️</th>
+                        <th onclick="sortTable(4)">Phase ↕️</th>
+                        <th onclick="sortTable(5)">Cost ↕️</th>
+                        <th onclick="sortTable(6)">Duration ↕️</th>
+                        <th onclick="sortTable(7)">Description ↕️</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -93,15 +98,18 @@
     <script>
         // Embedded cost data
         const costData = [
-        ["2025-06-12", "21:30:00", "Recall", "Setup & Planning", "2.83", "59m 32s", "Project init best practices setup GitHub issues", "session_001"],
-        ["2025-06-12", "22:15:00", "Recall", "Setup", "0.74", "37m 15s", "Created cost tracking system with CSV and HTML dashboard", "session_002"],
-        ["2025-06-12", "22:30:00", "Recall", "Setup", "0.03", "8m 15s", "Created cost tracking quick guide documentation", "session_003"],
-        ["2025-06-12", "12:37:11", "MCP-Cost-Tracker", "Development", "2.75", "45m", "Test cost tracking functionality", "session_1749767831"],
-        ["2025-06-12", "17:04:53", "MCP-Cost-Tracker", "Development", "2.75", "45m", "Test cost tracking functionality", "session_1749783893"],
-        ["2025-06-12", "17:04:55", "MCP-Cost-Tracker", "Testing", "2.5", "30m", "MCP server test", "session_1749783895"],
-        ["2025-06-12", "20:15:14", "MCP-Cost-Tracker", "Development", "2.75", "45m", "Test cost tracking functionality", "session_1749795314"],
-        ["2025-06-12", "20:15:19", "MCP-Cost-Tracker", "Testing", "2.5", "30m", "MCP server test", "session_1749795319"],
-        ["2025-06-12", "20:56:00", "MCP-Cost-Tracker", "Testing", "1.25", "15m", "Testing tc command functionality", "session_1749797760"]
+        ["1", "2025-06-12", "21:30:00", "Recall", "Setup & Planning", "2.83", "59m 32s", "Project init best practices setup GitHub issues", "session_001"],
+        ["2", "2025-06-12", "22:15:00", "Recall", "Setup", "0.74", "37m 15s", "Created cost tracking system with CSV and HTML dashboard", "session_002"],
+        ["3", "2025-06-12", "22:30:00", "Recall", "Setup", "0.03", "8m 15s", "Created cost tracking quick guide documentation", "session_003"],
+        ["4", "2025-06-12", "12:37:11", "MCP-Cost-Tracker", "Development", "2.75", "45m", "Test cost tracking functionality", "session_1749767831"],
+        ["5", "2025-06-12", "17:04:53", "MCP-Cost-Tracker", "Development", "2.75", "45m", "Test cost tracking functionality", "session_1749783893"],
+        ["6", "2025-06-12", "17:04:55", "MCP-Cost-Tracker", "Testing", "2.5", "30m", "MCP server test", "session_1749783895"],
+        ["7", "2025-06-12", "20:15:14", "MCP-Cost-Tracker", "Development", "2.75", "45m", "Test cost tracking functionality", "session_1749795314"],
+        ["8", "2025-06-12", "20:15:19", "MCP-Cost-Tracker", "Testing", "2.5", "30m", "MCP server test", "session_1749795319"],
+        ["9", "2025-06-12", "20:56:00", "MCP-Cost-Tracker", "Testing", "1.25", "15m", "Testing tc command functionality", "session_1749797760"],
+        ["10", "2025-06-12", "21:05:04", "MCP-Cost-Tracker", "Development", "0.35", "25m", "Initialized git repository and published MCP Cost Tracker to GitHub", "session_1749798304"],
+        ["11", "2025-06-12", "21:10:44", "MCP-Cost-Tracker", "Testing", "0.25", "10m", "Testing enhanced dashboard with session numbers and project totals", "session_1749798644"],
+        ["12", "2025-06-12", "21:11:49", "MCP-Cost-Tracker", "Development", "0.42", "20m", "Added session numbering and project total calculation to dashboard", "session_1749798709"]
         ];
 
         let currentSort = { column: 0, direction: 'desc' };
@@ -115,10 +123,10 @@
         }
 
         function updateStats() {
-            const totalCost = costData.reduce((sum, row) => sum + parseFloat(row[4] || 0), 0);
+            const totalCost = costData.reduce((sum, row) => sum + parseFloat(row[5] || 0), 0);
             const sessionCount = costData.length;
             const avgCost = sessionCount > 0 ? totalCost / sessionCount : 0;
-            const lastCost = sessionCount > 0 ? parseFloat(costData[costData.length - 1][4] || 0) : 0;
+            const lastCost = sessionCount > 0 ? parseFloat(costData[costData.length - 1][5] || 0) : 0;
 
             document.getElementById('totalCost').textContent = `$${totalCost.toFixed(2)}`;
             document.getElementById('sessionCount').textContent = sessionCount;
@@ -127,8 +135,8 @@
         }
 
         function populateFilters() {
-            const projects = [...new Set(costData.map(row => row[2]))].sort();
-            const phases = [...new Set(costData.map(row => row[3]))].sort();
+            const projects = [...new Set(costData.map(row => row[3]))].sort();
+            const phases = [...new Set(costData.map(row => row[4]))].sort();
 
             const projectFilter = document.getElementById('projectFilter');
             const phaseFilter = document.getElementById('phaseFilter');
@@ -153,22 +161,23 @@
             tbody.innerHTML = '';
 
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="no-data">No sessions found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="no-data">No sessions found</td></tr>';
                 return;
             }
 
             filteredData.forEach(row => {
                 const tr = document.createElement('tr');
-                const phaseClass = `phase-${row[3].toLowerCase().replace(/[^a-z]/g, '')}`;
+                const phaseClass = `phase-${row[4].toLowerCase().replace(/[^a-z]/g, '')}`;
                 
                 tr.innerHTML = `
                     <td>${row[0]}</td>
                     <td>${row[1]}</td>
                     <td>${row[2]}</td>
-                    <td><span class="phase-tag ${phaseClass}">${row[3]}</span></td>
-                    <td class="cost">$${parseFloat(row[4]).toFixed(2)}</td>
-                    <td>${row[5]}</td>
+                    <td>${row[3]}</td>
+                    <td><span class="phase-tag ${phaseClass}">${row[4]}</span></td>
+                    <td class="cost">$${parseFloat(row[5]).toFixed(2)}</td>
                     <td>${row[6]}</td>
+                    <td>${row[7]}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -186,9 +195,12 @@
                 let aVal = a[columnIndex];
                 let bVal = b[columnIndex];
 
-                if (columnIndex === 4) { // Cost column
+                if (columnIndex === 5) { // Cost column
                     aVal = parseFloat(aVal);
                     bVal = parseFloat(bVal);
+                } else if (columnIndex === 0) { // Session number column
+                    aVal = parseInt(aVal);
+                    bVal = parseInt(bVal);
                 }
 
                 if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
@@ -208,13 +220,30 @@
                 const matchesSearch = row.some(cell => 
                     cell.toString().toLowerCase().includes(searchTerm)
                 );
-                const matchesProject = !projectFilter || row[2] === projectFilter;
-                const matchesPhase = !phaseFilter || row[3] === phaseFilter;
+                const matchesProject = !projectFilter || row[3] === projectFilter;
+                const matchesPhase = !phaseFilter || row[4] === phaseFilter;
 
                 return matchesSearch && matchesProject && matchesPhase;
             });
 
+            // Update project total if a project is selected
+            updateProjectTotal(projectFilter);
             renderTable();
+        }
+
+        function updateProjectTotal(selectedProject) {
+            const projectTotalCard = document.getElementById('projectTotalCard');
+            const projectTotal = document.getElementById('projectTotal');
+            const projectTotalLabel = document.getElementById('projectTotalLabel');
+
+            if (selectedProject) {
+                const projectCost = filteredData.reduce((sum, row) => sum + parseFloat(row[5] || 0), 0);
+                projectTotal.textContent = `$${projectCost.toFixed(2)}`;
+                projectTotalLabel.textContent = `${selectedProject} Total`;
+                projectTotalCard.style.display = 'block';
+            } else {
+                projectTotalCard.style.display = 'none';
+            }
         }
 
         function setupEventListeners() {

@@ -38,7 +38,7 @@ class CostTracker:
             with open(self.csv_file, 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([
-                    'Date', 'Time', 'Project', 'Phase', 'Cost', 
+                    'Session', 'Date', 'Time', 'Project', 'Phase', 'Cost', 
                     'Duration', 'Description', 'Session_ID'
                 ])
     
@@ -71,15 +71,23 @@ class CostTracker:
         date_str = timestamp.strftime("%Y-%m-%d")
         time_str = timestamp.strftime("%H:%M:%S")
         
+        # Get next session number
+        session_number = self._get_next_session_number()
+        
         # Append to CSV file
         with open(self.csv_file, 'a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([
-                date_str, time_str, project, phase, cost,
+                session_number, date_str, time_str, project, phase, cost,
                 duration, description, session_id
             ])
         
         return session_id
+    
+    def _get_next_session_number(self) -> int:
+        """Get the next session number by counting existing sessions."""
+        sessions = self._read_sessions()
+        return len(sessions) + 1
     
     def get_summary(self) -> Dict[str, Any]:
         """
@@ -106,7 +114,7 @@ class CostTracker:
                 "last_cost": 0.0
             }
         
-        costs = [float(session['Cost']) for session in sessions]
+        costs = [float(session['Cost']) for session in sessions if session.get('Cost')]
         total_cost = sum(costs)
         session_count = len(sessions)
         average_cost = total_cost / session_count if session_count > 0 else 0.0

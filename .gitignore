@@ -55,3 +55,13 @@ config.local.*
 # Temporary files
 *.tmp
 *.temp
+
+# Screenshot placeholder (until real screenshot is added)
+screenshot-instructions.md
+
+# Web dashboard backup files
+web/costs_backup.html
+
+# Local development data (optional - users may want to track their own costs)
+# Uncomment the line below if you don't want your personal cost data in version control
+# data/costs.csv

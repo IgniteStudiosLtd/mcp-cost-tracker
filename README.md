@@ -1,108 +1,167 @@
 # MCP Cost Tracker
 
-A standalone MCP (Model Context Protocol) server for tracking Claude Code usage costs across all projects.
+A professional MCP (Model Context Protocol) server for tracking Claude Code usage costs across all your projects. Built for developers who want to monitor and analyze their AI development costs with precision.
 
-## Overview
+## 🚀 Features
 
-This tool provides centralized cost tracking for Claude Code sessions with:
-- **CSV database** for lightweight, portable storage
-- **Interactive HTML dashboard** for data visualization
-- **MCP server** for integration with Claude Code
-- **Global command shortcuts** for easy access
+- **📊 Session Tracking**: Log costs with session numbers, duration, phase, and descriptions  
+- **🌐 Interactive Dashboard**: Beautiful web interface with sorting, filtering, and search
+- **📈 Project Analytics**: Calculate total costs per project when filtering
+- **🔗 Global MCP Integration**: Access from any Claude Code session across all projects
+- **💾 Portable CSV Storage**: Lightweight, version-controllable data format
+- **⚡ Command Line Tools**: Quick cost entry and viewing with `/tc`, `/vc`, `/costs`
 
-## Features
+## 📸 Dashboard Preview
 
-- 📊 **Cost Tracking**: Log session costs, duration, phase, and descriptions
-- 🌐 **Web Dashboard**: Interactive browser-based cost analysis
-- 📈 **Analytics**: Total costs, averages, trends over time
-- 🔍 **Search & Filter**: Find sessions by project, phase, or keywords
-- 💾 **Portable Data**: Single CSV file with all cost history
-- 🔗 **MCP Integration**: Use from any Claude Code project
+![MCP Cost Tracker Dashboard](screenshot.png)
 
-## Quick Start
+*Interactive dashboard showing session tracking with project filtering and cost analytics*
 
-### 1. Setup
+## 🛠 Installation
+
+### Prerequisites
+- Python 3.7+
+- Claude Code installed and configured
+- Git (for cloning the repository)
+
+### Step 1: Clone Repository
 ```bash
-# Install dependencies (if any)
+git clone https://github.com/YOUR_USERNAME/mcp-cost-tracker.git
 cd mcp-cost-tracker
-npm install  # or pip install if Python dependencies exist
 ```
 
-### 2. Usage
+### Step 2: Set Up Permissions
 ```bash
-# Track a new session
-/tc    # Interactive prompt for cost details
-
-# View dashboard
-/vc    # Opens web dashboard in browser
-
-# Quick summary
-/costs # Terminal one-liner: Last task | Project total | Global total
+# Make command scripts executable
+chmod +x commands/*
+chmod +x mcp-cost-server
 ```
 
-### 3. MCP Integration
-```bash
-# Start MCP server
-python mcp_server.py
+### Step 3: Configure Global MCP Server
 
-# Connect from Claude Code projects
-# Add to .claude/settings.json:
+Add to your **global** Claude Code settings at `~/.config/claude/settings.json`:
+
+```json
 {
   "mcpServers": {
     "cost-tracker": {
-      "url": "http://localhost:8080/mcp"
+      "command": "/full/path/to/mcp-cost-tracker/mcp-cost-server",
+      "args": []
     }
   }
 }
 ```
 
-## File Structure
+**Important**: Replace `/full/path/to/mcp-cost-tracker/` with your actual installation path.
 
-- `data/` - Cost tracking data storage
-- `web/` - HTML dashboard and assets  
-- `commands/` - Global command shortcuts
-- `mcp_server.py` - MCP server implementation
-- `cost_tracker.py` - Core cost tracking logic
+### Step 4: Test Installation
 
-## Data Storage
+1. **Start Claude Code** in any project
+2. **Test MCP connection**: Ask Claude to use the `get_cost_summary` tool
+3. **Test local commands**: Run `./commands/costs` from the mcp-cost-tracker directory
 
-All cost data is stored in `data/costs.csv` with the following schema:
+## 💡 Usage
 
-```csv
-Date,Time,Project,Phase,Cost,Duration,Description,Session_ID
-2025-06-12,21:30:00,MyProject,Development,2.83,45m,Added new feature,session_001
+### Command Line Interface
+
+From the mcp-cost-tracker directory:
+
+```bash
+# Track a new session (interactive prompts)
+./commands/tc
+
+# View dashboard in browser  
+./commands/vc
+
+# Quick cost summary
+./commands/costs
 ```
 
-## Dashboard Features
+### MCP Tools (Available in any Claude Code session)
 
-- **Summary Cards**: Total cost, session count, averages
-- **Interactive Table**: Sortable, searchable session history
-- **Phase Filtering**: Group by development phase
-- **Export Options**: Download data in various formats
+- **`track_cost`**: Log session costs with structured parameters
+- **`get_cost_summary`**: Retrieve total cost statistics  
+- **`get_cost_history`**: Get filtered session history
+- **`generate_dashboard`**: Update the HTML dashboard
 
-## Global Commands
+### Example MCP Usage
 
-- `/tc` - Track costs (prompts for session details)
-- `/vc` - View costs (opens dashboard)
-- `/costs` - Quick cost summary
+In any Claude Code session:
+```
+Use the track_cost tool to log this session with cost 2.50, duration "30m", phase "Development", description "Added user authentication", project "MyApp"
+```
 
-## Integration with Claude Code
+## 📊 Data Schema
 
-This tool is designed to work seamlessly with Claude Code through MCP. It can:
+Sessions are stored in `data/costs.csv`:
 
-1. **Automatically capture** Claude Code session costs
-2. **Store centrally** across all your projects
-3. **Provide insights** into development costs and patterns
-4. **Export data** for accounting and budgeting
+```csv
+Session,Date,Time,Project,Phase,Cost,Duration,Description,Session_ID
+1,2025-06-12,21:30:00,MyProject,Development,2.83,45m,Added new feature,session_001
+2,2025-06-12,22:15:00,MyProject,Testing,1.25,20m,Fixed user login bug,session_002
+```
 
-## Development
+## 🏗 Architecture
 
-The tool is built with:
-- **Python** for MCP server and core logic
-- **HTML/CSS/JavaScript** for dashboard
-- **CSV** for data storage
-- **Bash scripts** for command shortcuts
+```
+mcp-cost-tracker/
+├── src/
+│   ├── cost_tracker.py      # Core cost tracking logic
+│   └── mcp_server.py        # MCP protocol implementation
+├── commands/
+│   ├── config.sh           # Shared configuration
+│   ├── tc                  # Track costs command
+│   ├── vc                  # View dashboard command
+│   └── costs               # Quick summary command
+├── data/
+│   └── costs.csv           # Cost data storage
+├── web/
+│   └── costs.html          # Generated dashboard
+└── mcp-cost-server         # Global MCP server launcher
+```
 
-## License
+## 🔧 Advanced Configuration
 
-MIT License - Feel free to use and modify for your needs.
+### Custom Data Directory
+```bash
+# Use custom data location
+python src/mcp_server.py --data-dir /path/to/custom/data
+```
+
+### Dashboard Customization
+The dashboard auto-generates from CSV data. To customize:
+1. Modify `commands/generate-dashboard` 
+2. Update HTML template and JavaScript
+3. Run `./commands/generate-dashboard` to rebuild
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -am 'Add feature'`
+4. Push to branch: `git push origin feature-name`
+5. Submit a Pull Request
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Gilbert King**  
+- GitHub: [@kingigilbert](https://github.com/kingigilbert)
+- Company: Ignite Studios Ltd
+
+## 🐛 Issues & Support
+
+- **Bug Reports**: [GitHub Issues](https://github.com/YOUR_USERNAME/mcp-cost-tracker/issues)
+- **Feature Requests**: [GitHub Discussions](https://github.com/YOUR_USERNAME/mcp-cost-tracker/discussions)
+- **Documentation**: See [setup-global-mcp.md](setup-global-mcp.md) for detailed MCP configuration
+
+## 🙏 Acknowledgments
+
+Built with [Claude Code](https://claude.ai/code) - AI-powered development tool by Anthropic.
+
+---
+
+**⭐ Star this repository if it helps you track your AI development costs!**
